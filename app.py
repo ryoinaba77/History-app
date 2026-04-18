@@ -1,29 +1,34 @@
 import streamlit as st
+import pandas as pd
 import random
 
-events = [
-    {"event": "大化の改新", "year": 645},
-    {"event": "壬申の乱", "year": 672},
-    {"event": "平安京遷都", "year": 794},
-    {"event": "鎌倉幕府成立", "year": 1192},
-    {"event": "承久の乱", "year": 1221},
-    {"event": "応仁の乱", "year": 1467},
-    {"event": "関ヶ原の戦い", "year": 1600},
-    {"event": "江戸幕府成立", "year": 1603},
-    {"event": "日露戦争", "year": 1904},
-]
+# CSV読み込み
+df = pd.read_csv("data.csv")
 
-st.title("歴史問題ジェネレーター")
+st.title("歴史問題ジェネレーター（強化版）")
+
+mode = st.selectbox("問題タイプ", ["年号", "並び替え", "原因"])
 
 if st.button("問題を作る"):
-    selected = random.sample(events, 4)
-    st.write("次を古い順に並べなさい")
-    for i, e in enumerate(selected):
-        st.write(f"{chr(65+i)}. {e['event']}")
 
-    answer = sorted(selected, key=lambda x: x["year"])
-    
-    if st.button("答えを見る"):
-        st.write("答え：")
-        for e in answer:
-            st.write(e["event"])
+    if mode == "年号":
+        row = df.sample(1).iloc[0]
+        st.write(f"{row['event']}の年号は？")
+        if st.button("答え"):
+            st.write(f"{row['year']}年")
+
+    elif mode == "並び替え":
+        sample = df.sample(4)
+        st.write("次を古い順に並べなさい")
+        for i, r in enumerate(sample.itertuples()):
+            st.write(f"{chr(65+i)}. {r.event}")
+        if st.button("答え"):
+            sorted_df = sample.sort_values("year")
+            for r in sorted_df.itertuples():
+                st.write(r.event)
+
+    elif mode == "原因":
+        row = df.sample(1).iloc[0]
+        st.write(f"{row['event']}の原因は？")
+        if st.button("答え"):
+            st.write(row["cause"])
