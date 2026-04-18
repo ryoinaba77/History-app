@@ -86,3 +86,19 @@ if st.session_state.history:
             st.write(f"{k}：{v}問ミス")
     else:
         st.write("弱点なし！")
+# 弱点優先抽出
+def weighted_sample(df, history):
+    if len(history) < 5:
+        return df.sample(1)
+
+    wrong_categories = [h[1] for h in history if not h[0]]
+    if not wrong_categories:
+        return df.sample(1)
+
+    weak = random.choice(wrong_categories)
+    filtered = df[df["era"] == weak]
+
+    if len(filtered) > 0:
+        return filtered.sample(1)
+    else:
+        return df.sample(1)
